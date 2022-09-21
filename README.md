@@ -1,25 +1,6 @@
-# ScintillaNET.Demo
-This is an easy to understand C# app demonstrating all the features of the powerful ScintillaNET text editor component. ScintillaNET is a .NET wrapper for Scintilla, which is used as the primary code editor in numerous IDEs. Even the venerable Notepad++ uses Scintilla!
-
-We demonstrate:
-
-- syntax coloring / keywords
-- font / styling
-- number margin
-- bookmark margin
-- highlighting lines
-- code folding / regions
-- rectangular selection (hold ALT and drag)
-- drag and drop files
-- editing commands (casing, indenting)
-- quick search bar
-- zooming (hold CTRL and scroll)
-- hotkey system
-
-Coming soon:
-
-- suggestion lists / intellisense
-- brace matching
-- find & replace dialogs
-
-![](https://github.com/hgupta9/ScintillaNET.Demo/raw/master/images/demo2.png)
+# IGI-QVMEditor
+Project I.G.I QVM editor is only one and most powerful tool for game files for IGI 1 &amp; IGI 2.</br>
+This editor can _view/edit_ all types of _QVM_ files including complex files as well and can also detects and show information 
+about game models used in levels.</br></br>
+This editor can be used to write new script files _(.QSC) QSCRIPT_  as well editor has helper sections to understand how _Task Tree_ of scripts works and autocomplete shows you how to get familiar with the syntax.</br>
+Or you can _Analyze_ all the game files information using this editor to better understand how game works.
