@@ -10,7 +10,6 @@ namespace QVM_Editor
 {
     public partial class QVMEditorForm : Form
     {
-        internal QVMEditorForm thisReference;
         private string scriptFilePath = String.Empty;
         private string scriptFilePathAbsolute = String.Empty;
         internal Scintilla scintilla;
@@ -33,6 +32,9 @@ namespace QVM_Editor
 
             //Loading output path.
             QUtils.appOutPath = QUtils.LoadFile(QUtils.tempPathFile);
+            if (!String.IsNullOrEmpty(QUtils.appOutPath))
+            {
+            }
 
             //Setting output path.
             else
