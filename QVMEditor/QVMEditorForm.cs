@@ -33,10 +33,6 @@ namespace QVM_Editor
 
             //Loading output path.
             QUtils.appOutPath = QUtils.LoadFile(QUtils.tempPathFile);
-            if (!String.IsNullOrEmpty(QUtils.appOutPath))
-            {
-                //fileNameLabel.Text = "App data path found.";
-            }
 
             //Setting output path.
             else
@@ -45,6 +41,7 @@ namespace QVM_Editor
                 QUtils.SaveFile(QUtils.tempPathFile, QUtils.appOutPath);
             }
 
+            //Decompile the QVM File for Args (CLI).
             if (!String.IsNullOrEmpty(openFileName))
             {
                 DecompileQVM(openFileName);
