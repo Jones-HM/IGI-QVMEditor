@@ -1,4 +1,4 @@
-# IGI-QVMEditor
+# QVMEditor
 Project I.G.I QVM editor is only one and most powerful tool for game files for IGI 1 &amp; IGI 2.</br>
 This editor can _view/edit_ all types of _QVM_ files including complex files as well and can also detects and show information 
 about game models used in levels.</br></br>
@@ -9,64 +9,64 @@ Or you can _Analyze_ all the game files information using this editor to better 
 ### QVM Editor:
 **QVM Editor**: Lets you to `view` and `edit` any _QVM_ file of game including complex structure like _Config_.</br>
 
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_main.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_main.png?raw=true)</br>
 
 ### Text Editor
 **Text Editor**: Lets you to `view` and `edit` script files _(QSC)_ of game converted by _QVM_ editor .</br>
 To select a file Press _File -> Open_ to open it or Just **Drag & Drop** any _QVM_ file into the editor.
 
 ### **Drag & Drop** any _QVM_ file:
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_dragdrop_start.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_dragdrop_start.png?raw=true)</br>
 
 ### **Drag & Drop** file loaded:
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_dragdrop_end.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_dragdrop_end.png?raw=true)</br>
 
 ### Editor Helpers (Syntax):
 **Editor Helpers**: Helps you to understand the basic _syntax_ of _QScript_ files like _Task Tree_,_Task Id_,_Task Note_ etc 
 and helps in writing/editing scripts better with _Autocomplete_ feature.
 
 ### **Syntax Helper**:
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_tooltip.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_tooltip.png?raw=true)</br>
 
 ### **Autocomplete Helper**:
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_autocomplete.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_autocomplete.png?raw=true)</br>
 
 ### Model Information:
 **Model Information**: Provides details information about game model formats like **000_01_1** model and their _Id's,Name(s)_ in the game script.
 This is very handy when you have file which has lots of model id's and you want to know all model information like _Name(s)_ inside same script.
 
 ### **Model info Helper**:
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_modelinfo_tooltip.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_modelinfo_tooltip.png?raw=true)</br>
 
 ### **Model info Revealer Before**:
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_modelinfo_reveal_before.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_modelinfo_reveal_before.png?raw=true)</br>
 
 ### **Model info Revealer After**:
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_modelinfo_reveal_after.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_modelinfo_reveal_after.png?raw=true)</br>
 
 ### Model Information Improving/Adding:
 **Model Information Improving**: This sections lets you to improve model information way better by adding new definition _name(s)_ to _Unknown Models_ you
 encountered in random script and will be saved permanently in file `IGIModels.txt` that has all models list.
 
 ### **Model info Improving**:
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_improve.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_improve.png?raw=true)</br>
 
 ### **Model info Improving Input**:
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_improve_input.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_improve_input.png?raw=true)</br>
 
 ### **Model info Improving Saved**:
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_improve_saved.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_improve_saved.png?raw=true)</br>
 
 ### Setting as default editor for QVM files:
 **Setting default editor**: This sections lets you to set this editor as your default editor for _QVM_ files rather than any random _Hex Editor_ like _HxD_
 which will edit in binary but this editor lets you to edit in _Script_ file rather than in _Binary_ format.
 
 ### **Setting default app**:
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_set_open_default_app.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_set_open_default_app.png?raw=true)</br>
 
 ### **Opening QVM file**:
 After setting default app as this editor you can now open _QVM_ files directly by _Double-Click_ on any _QVM_ file.
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_set_open_default_app_open.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_set_open_default_app_open.png?raw=true)</br>
 
 ### Theme Editor:
 **Theme Editor**: Lets you to `choose` and `select` any _theme_ you want for editor including_.</br>
@@ -77,10 +77,10 @@ Automaitcally editor will switch theme as per your system _(_sync_) with time.
 
 ### **Theme changing menu**:
 To change theme go to _Edit -> Theme -> Select your theme_ 
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_change_theme.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_change_theme.png?raw=true)</br>
 
 ### **Dark theme**:
-![](https://raw.githubusercontent.com/IGI-Research-Devs/IGI-QVMEditor/main/resources/qvm_editor_change_theme_dark.png)</br>
+![](https://github.com/IGI-Research-Devs/QVMEditor/blob/master/resources/qvm_editor_change_theme_dark.png?raw=true)</br>
 
 ## Features:
 * Editor can edit all type of **QMV Files** with _QVM(V5) and QVM(v7)_ with **advanced editor**.
