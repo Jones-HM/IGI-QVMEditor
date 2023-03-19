@@ -5,6 +5,8 @@ using System.IO;
 using ScintillaNET;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace QVM_Editor
 {
@@ -109,8 +111,29 @@ namespace QVM_Editor
                         if (!String.IsNullOrEmpty(modelInput))
                         {
                             modelInput = modelInput.ToUpper();
-                            string objectData = "\n" + modelInput + " = " + modelId;
-                            QUtils.SaveFile(objectData, true, QUtils.objectsModelsFile);
+
+                            // Read the contents of the file into a string
+                            string fileContents = QUtils.LoadFile(QUtils.objectsModelsFile);
+
+                            // Parse the JSON string into a JArray object
+                            JArray modelsArray = JArray.Parse(fileContents);
+
+                            // Create a new JObject for the new data
+                            JObject newModel = new JObject(
+                                new JProperty("ModelName", modelInput),
+                                new JProperty("ModelId", modelId)
+                            );
+
+                            // Add the new data to the array
+                            modelsArray.Add(newModel);
+
+                            // Serialize the updated array back to JSON format
+                            string updatedFileContents = JsonConvert.SerializeObject(modelsArray, Formatting.Indented);
+
+                            // Write the updated JSON string to the file
+                            QUtils.SaveFile(updatedFileContents, false, QUtils.objectsModelsFile);
+
+                            // Show a message to confirm that the model has been saved
                             QUtils.ShowInfo("Model saved " + modelId + " : " + modelInput);
 
                             //Reload the Master objects list.
@@ -336,10 +359,21 @@ namespace QVM_Editor
         {
             try
             {
-                var fopenIO = QUtils.ShowOpenFileDlg("Select QVM file", ".qvm", "QVM files (*.qvm)|*.qvm|All files (*.*)|*.*", true);
+                var fopenIO = QUtils.ShowOpenFileDlg("Select QVM file",".qvm", "QVM files (*.qvm)|*.qvm|DAT files (*.dat)|*.dat|QSC files (*.qsc)|*.qsc|All files (*.*)|*.*",true);
                 string fileName = fopenIO.FileName;
                 scriptFilePathAbsolute = Path.GetDirectoryName(fileName);
-                DecompileQVM(fileName);
+
+                string fileExtension = Path.GetExtension(fopenIO.FileName);
+                if (fileExtension.ToLower() == ".dat" ||
+                    fileExtension.ToLower() == ".qsc" ||
+                    fileExtension.ToLower() == ".txt")
+                {
+                    scintilla.Text = QUtils.LoadFile(fopenIO.FileName);
+                }
+                else
+                {
+                    DecompileQVM(fileName);
+                }
             }
             catch (Exception ex)
             {
@@ -887,7 +921,6 @@ namespace QVM_Editor
         {
             Environment.Exit(0);
         }
-
 
         private void DecompileQVM(string fileName)
         {
