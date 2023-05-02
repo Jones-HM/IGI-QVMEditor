@@ -26,7 +26,9 @@ namespace QVM_Editor
             qvmInstance = this;
             QUtils.InitEditorAppData();
             appVersionTxt.Text = "Version: " + QUtils.appVersion;
+            QUtils.enableLogs = true;
 
+            QUtils.AddLog("QVM Editor Started.");
             // Init Scintilla component.
             scintilla = new StandardScintilla();
             TextPanel.Controls.Add(scintilla);
@@ -36,6 +38,7 @@ namespace QVM_Editor
             QUtils.appOutPath = QUtils.LoadFile(QUtils.tempPathFile);
             if (!String.IsNullOrEmpty(QUtils.appOutPath))
             {
+                QUtils.AddLog("Output path loaded: " + QUtils.appOutPath);
             }
 
             //Setting output path.
@@ -43,11 +46,13 @@ namespace QVM_Editor
             {
                 QUtils.appOutPath = QUtils.qCompilerPath + @"\Decompile\output\";
                 QUtils.SaveFile(QUtils.tempPathFile, QUtils.appOutPath);
+                QUtils.AddLog("Output path set to default: " + QUtils.appOutPath);
             }
 
             //Decompile the QVM File for Args (CLI).
             if (!String.IsNullOrEmpty(openFileName))
             {
+                QUtils.AddLog("Decompiling QVM File: " + openFileName);
                 DecompileQVM(openFileName);
             }
         }
@@ -907,13 +912,13 @@ namespace QVM_Editor
             string scriptFileQvm = scriptFilePathAbsolute + "\\" + fileNameLabel.Text;
             string scriptFileQsc = fileNameLabel.Text.Replace(QUtils.qvmFile, QUtils.qscFile);
             string scriptData = scintilla.Text;
-
+            QUtils.AddLog("Saving file: " + scriptFileQsc + " scriptFileQvm: " + scriptFileQvm) + " scriptData: " + scriptData;
             bool status = QCompiler.Compile(scriptData, scriptFilePathAbsolute, false, fileNameLabel.Text.Replace(QUtils.qvmFile, QUtils.qscFile));
 
             if (status)
             {
                 QUtils.FileIODelete(scriptFileQsc);
-                //fileNameLabel.Text = "File saved successfully";
+                QUtils.AddLog("File saved successfully");
             }
         }
 
@@ -924,11 +929,14 @@ namespace QVM_Editor
 
         private void DecompileQVM(string fileName)
         {
+            QUtils.AddLog("Decompiling file: " + fileName);
             QCompiler.DecompileFile(fileName, QUtils.appOutPath);
+            QUtils.AddLog("Decompiling done");
 
             scriptFilePath = QUtils.appOutPath + Path.DirectorySeparatorChar + Path.GetFileName(fileName).Replace(QUtils.qvmFile, QUtils.qscFile);
             fileNameLabel.Text = Path.GetFileNameWithoutExtension(fileName) + QUtils.qvmFile;
             scintilla.Text = QUtils.LoadFile(scriptFilePath);
+            QUtils.AddLog("Files path are {scriptFilePath} {fileNameLabel.Text}");
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)

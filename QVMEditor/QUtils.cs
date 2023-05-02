@@ -15,9 +15,9 @@ namespace QVM_Editor
     internal class QUtils
     {
         private static string logFile;
-        internal const string appVersion = "0.3",qvmFile = ".qvm",qscFile = ".qsc", CAPTION_CONFIG_ERR = "Config - Error", CAPTION_FATAL_SYS_ERR = "Fatal sytem - Error", CAPTION_APP_ERR = "Application - Error", CAPTION_COMPILER_ERR = "Compiler - Error", EDITOR_LEVEL_ERR = "EDITOR ERROR";
+        internal const string appVersion = "0.3", qvmFile = ".qvm", qscFile = ".qsc", CAPTION_CONFIG_ERR = "Config - Error", CAPTION_FATAL_SYS_ERR = "Fatal sytem - Error", CAPTION_APP_ERR = "Application - Error", CAPTION_COMPILER_ERR = "Compiler - Error", EDITOR_LEVEL_ERR = "EDITOR ERROR";
         internal static bool logEnabled = false;
-        internal static string appdataPath, qvmEditorQEdPath, objectsModelsFile, editorAppName, qfilesPath = @"\QFiles", qEditor = "QEditor", qconv = "QConv", qCompiler = "QCompiler", qCompilerPath, tempPathFile,tempPathFileName = "TempPath.txt",
+        internal static string appdataPath, qvmEditorQEdPath, objectsModelsFile, editorAppName, qfilesPath = @"\QFiles", qEditor = "QEditor", qconv = "QConv", qCompiler = "QCompiler", qCompilerPath, tempPathFile, tempPathFileName = "TempPath.txt",
          igiQsc = "IGI_QSC", igiQvm = "IGI_QVM", cfgGamePathEx = @"\missions\location0\level", weaponsDirPath = @"\weapons";
         internal static string keywordsFile = "keywords.txt", objectsQsc = "objects.qsc", objectsQvm = "objects.qvm";
 
@@ -126,7 +126,7 @@ namespace QVM_Editor
             else if (!Directory.Exists(qCompilerPath)) { initErrReason = @"QEditor\QCompiler"; initStatus = false; }
 
             initErrReason = "'" + initErrReason + "' Directory is missing";
-            
+
             //Show error if 'QEditor' path has invalid structure..
             if (!initStatus)
             {
@@ -217,6 +217,19 @@ namespace QVM_Editor
             if (logEnabled)
             {
                 methodName = methodName.Replace("_Click", String.Empty).Replace("_SelectedIndexChanged", String.Empty).Replace("_SelectedValueChanged", String.Empty);
+                File.AppendAllText(logFile, "[" + DateTime.Now.ToString("yyyy-MM-dd - HH:mm:ss") + "] " + methodName + "(): " + logMsg + "\n");
+            }
+        }
+
+        internal static void AddLog(string logMsg)
+        {
+            if (logEnabled)
+            {
+                var methodName = new StackTrace().GetFrame(1).GetMethod().Name
+                    .Replace("_Click", "")
+                    .Replace("_SelectedIndexChanged", "")
+                    .Replace("_SelectedValueChanged", "");
+
                 File.AppendAllText(logFile, "[" + DateTime.Now.ToString("yyyy-MM-dd - HH:mm:ss") + "] " + methodName + "(): " + logMsg + "\n");
             }
         }
