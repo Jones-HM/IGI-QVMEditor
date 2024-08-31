@@ -55,13 +55,36 @@ namespace QVM_Editor
             var qCompilerCurrPath = qEdCurrPath + "\\" + "QCompiler";
             var keywordFilePath = qEdCurrPath + "\\" + keywordsFile;
 
-            if (Directory.Exists(qEdCurrPath) && Directory.Exists(qCompilerCurrPath) && !Directory.Exists(qvmEditorQEdPath))
+            try
             {
-                DirectoryMove(qEdCurrPath, destPath + "\\" + "QEditor");
+                if (Directory.Exists(qEdCurrPath) && Directory.Exists(qCompilerCurrPath) && !Directory.Exists(qvmEditorQEdPath))
+                {
+                    DirectoryMove(qEdCurrPath, destPath + "\\" + "QEditor");
+                }
+                if (File.Exists(keywordFilePath))
+                {
+                    QUtils.FileIOMove(keywordFilePath, qvmEditorQEdPath + "\\" + keywordsFile);
+                }
             }
-            if (File.Exists(keywordFilePath))
+            catch (Exception ex)
             {
-                QUtils.FileIOMove(keywordFilePath, qvmEditorQEdPath + "\\" + keywordsFile);
+                try
+                {
+                    if (Directory.Exists(qEdCurrPath) && Directory.Exists(qCompilerCurrPath) && !Directory.Exists(qvmEditorQEdPath))
+                    {
+                        DirectoryCopy(qEdCurrPath, destPath + "\\" + "QEditor", true);
+                        Directory.Delete(qEdCurrPath, true);
+                    }
+                    if (File.Exists(keywordFilePath))
+                    {
+                        QUtils.FileIOMove(keywordFilePath, qvmEditorQEdPath + "\\" + keywordsFile);
+                    }
+                }
+                catch (Exception innerEx)
+                {
+                    ShowLogException(MethodBase.GetCurrentMethod().Name, innerEx);
+                    throw;
+                }
             }
         }
 
@@ -122,6 +145,8 @@ namespace QVM_Editor
             objectsModelsFile = qvmEditorQEdPath + Path.DirectorySeparatorChar + "IGIModels.json";
             tempPathFile = qvmEditorQEdPath + "\\" + tempPathFileName;
 
+            MoveQEditorDir(appdataPath);
+
             if (!Directory.Exists(qvmEditorQEdPath)) { initErrReason = "QEditor"; initStatus = false; }
             else if (!Directory.Exists(qCompilerPath)) { initErrReason = @"QEditor\QCompiler"; initStatus = false; }
 
@@ -130,10 +155,9 @@ namespace QVM_Editor
             //Show error if 'QEditor' path has invalid structure..
             if (!initStatus)
             {
-                ShowSystemFatalError("QVVM Editor Appdata directory is invalid Error: (0x0000000F)\nReason: " + initErrReason + "\nPlease re-install new copy from Setup file.");
+                ShowSystemFatalError("QVM Editor Appdata directory is invalid Error: (0x0000000F)\nReason: " + initErrReason + "\nPlease re-install new copy from Setup file.");
             }
 
-            MoveQEditorDir(appdataPath);
             //Init Game objects and Keywords.
             InitGameObjectsInfo();
             InitKeywords();
