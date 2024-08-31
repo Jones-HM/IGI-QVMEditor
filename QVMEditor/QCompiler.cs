@@ -100,7 +100,7 @@ namespace QVM_Editor
         private bool XMove(string src, string dest, QTYPE qtype)
         {
             bool status = true;
-            string filter = "*.";
+            // string filter = "*.";
             
             if (qtype == QTYPE.COMPILE)
             {

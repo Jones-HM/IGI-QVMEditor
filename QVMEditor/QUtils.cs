@@ -15,7 +15,7 @@ namespace QVM_Editor
     internal class QUtils
     {
         private static string logFile;
-        internal const string appVersion = "0.3", qvmFile = ".qvm", qscFile = ".qsc", CAPTION_CONFIG_ERR = "Config - Error", CAPTION_FATAL_SYS_ERR = "Fatal sytem - Error", CAPTION_APP_ERR = "Application - Error", CAPTION_COMPILER_ERR = "Compiler - Error", EDITOR_LEVEL_ERR = "EDITOR ERROR";
+        internal const string appVersion = "0.4", qvmFile = ".qvm", qscFile = ".qsc", CAPTION_CONFIG_ERR = "Config - Error", CAPTION_FATAL_SYS_ERR = "Fatal sytem - Error", CAPTION_APP_ERR = "Application - Error", CAPTION_COMPILER_ERR = "Compiler - Error", EDITOR_LEVEL_ERR = "EDITOR ERROR";
         internal static bool logEnabled = false;
         internal static string appdataPath, qvmEditorQEdPath, objectsModelsFile, editorAppName, qfilesPath = @"\QFiles", qEditor = "QEditor", qconv = "QConv", qCompiler = "QCompiler", qCompilerPath, tempPathFile, tempPathFileName = "TempPath.txt",
          igiQsc = "IGI_QSC", igiQvm = "IGI_QVM", cfgGamePathEx = @"\missions\location0\level", weaponsDirPath = @"\weapons";
@@ -66,7 +66,7 @@ namespace QVM_Editor
                     QUtils.FileIOMove(keywordFilePath, qvmEditorQEdPath + "\\" + keywordsFile);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 try
                 {
@@ -555,6 +555,34 @@ namespace QVM_Editor
                         //#3 solution to move with 'move' command.
                         ShellExec(moveCmd, true);
                 }
+            }
+        }
+
+        public static void DirectoryCopy(string sourceDir, string destDir, bool copySubDirs)
+        {
+            try
+            {
+                // Create the destination directory if it does not exist.
+                Directory.CreateDirectory(destDir);
+
+                // Copy each file into the new directory.
+                foreach (FileInfo file in new DirectoryInfo(sourceDir).GetFiles())
+                {
+                    file.CopyTo(Path.Combine(destDir, file.Name), false);
+                }
+
+                // Copy subdirectories and their contents to new locations if required.
+                if (copySubDirs)
+                {
+                    foreach (DirectoryInfo subdir in new DirectoryInfo(sourceDir).GetDirectories())
+                    {
+                        DirectoryCopy(subdir.FullName, Path.Combine(destDir, subdir.Name), true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowLogException(MethodBase.GetCurrentMethod().Name, ex);
             }
         }
 
