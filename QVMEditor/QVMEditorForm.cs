@@ -1221,6 +1221,10 @@ namespace QVM_Editor
             fileNameLabel.Text = Path.GetFileNameWithoutExtension(fileName) + QUtils.qvmFile;
             scintilla.Text = QUtils.LoadFile(scriptFilePath);
             QUtils.AddLog("Files path are {scriptFilePath} {fileNameLabel.Text}");
+
+            // decompile the qvm version.
+            string qvmVersion = QUtils.ReadQVMVersion(fileName);
+            QUtils.AddLog("QVM version is {qvmVersion}");
             QUtils.AddLog("Exiting method: DecompileQVM()");
         }
 

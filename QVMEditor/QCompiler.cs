@@ -10,7 +10,8 @@ namespace QVM_Editor
         private enum QTYPE { COMPILE, DECOMPILE }
 
         private static readonly string appPath = Directory.GetCurrentDirectory();
-        private const string compileStart = "compile.bat";
+        private const string compileStartv5 = "compile_v5.bat";
+        private const string compileStartv7 = "compile_v7.bat";
         private const string decompileStart = "decompile.bat";
         internal static readonly string compilePath = Path.Combine(QUtils.qvmEditorQEdPath, QUtils.qCompiler, "Compile");
         internal static readonly string decompilePath = Path.Combine(QUtils.qvmEditorQEdPath, QUtils.qCompiler, "Decompile");
@@ -57,6 +58,13 @@ namespace QVM_Editor
                 }
 
                 QSetPath(compilePath);
+
+                // Checking the QVM version before saving.
+                string compileStart = "";
+                if (QUtils.qvmVersion == nameof(QUtils.QVMVersion.v0_85))
+                    compileStart = compileStartv5;
+                else if (QUtils.qvmVersion == nameof(QUtils.QVMVersion.v0_87))
+                    compileStart = compileStartv7;
 
                 string shellOut = QUtils.ShellExec(compileStart);
                 if (shellOut.Contains("Error") || shellOut.Contains("importModule") || shellOut.Contains("ModuleNotFoundError") || shellOut.Contains("Converted: 0"))

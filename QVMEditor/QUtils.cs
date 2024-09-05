@@ -9,6 +9,7 @@ using FileSystem = Microsoft.VisualBasic.FileIO.FileSystem;
 using System.Collections.Generic;
 using System.Drawing;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace QVM_Editor
 {
@@ -18,13 +19,19 @@ namespace QVM_Editor
         internal const string appVersion = "0.4", qvmFile = ".qvm", qscFile = ".qsc", CAPTION_CONFIG_ERR = "Config - Error", CAPTION_FATAL_SYS_ERR = "Fatal sytem - Error", CAPTION_APP_ERR = "Application - Error", CAPTION_COMPILER_ERR = "Compiler - Error", EDITOR_LEVEL_ERR = "EDITOR ERROR";
         internal static bool logEnabled = false;
         internal static string appdataPath, qvmEditorQEdPath, objectsModelsFile, editorAppName, qfilesPath = @"\QFiles", qEditor = "QEditor", qconv = "QConv", qCompiler = "QCompiler", qCompilerPath, tempPathFile, tempPathFileName = "TempPath.txt",
-         igiQsc = "IGI_QSC", igiQvm = "IGI_QVM", cfgGamePathEx = @"\missions\location0\level", weaponsDirPath = @"\weapons";
+         igiQsc = "IGI_QSC", igiQvm = "IGI_QVM", cfgGamePathEx = @"\missions\location0\level", weaponsDirPath = @"\weapons", qvmVersion = "";
         internal static string keywordsFile = "keywords.txt", objectsQsc = "objects.qsc", objectsQvm = "objects.qvm";
 
         public static string appOutPath { get; internal set; }
         internal static Dictionary<string, string> gameObjectsInfo = new Dictionary<string, string>();
         internal static string keywords;
         internal static string masterobjList;
+
+        public enum QVMVersion
+        {
+            v0_85,
+            v0_87
+        }
 
         internal class FOpenIO
         {
@@ -398,6 +405,47 @@ namespace QVM_Editor
             if (File.Exists(fileName))
                 data = File.ReadAllText(fileName);
             return data;
+        }
+
+        public static string ReadQVMVersion(string filePath)
+        {
+            try
+            {
+                using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                using (BinaryReader reader = new BinaryReader(fs))
+                {
+                    // Read the first 4 bytes for the signature and next 8 bytes for the version
+                    byte[] signatureBytes = reader.ReadBytes(4);
+                    string signature = Encoding.ASCII.GetString(signatureBytes);
+
+                    // Read version major and minor
+                    int verMajor = reader.ReadInt32();
+                    int verMinor = reader.ReadInt32();
+
+                    // Validate the signature and version
+                    if (signature != "LOOP")
+                    {
+                        throw new Exception($"Unexpected signature: {signature}");
+                    }
+                    if (verMajor != 8)
+                    {
+                        throw new Exception($"Unexpected ver_major: {verMajor}");
+                    }
+                    if (verMinor != 5 && verMinor != 7)
+                    {
+                        throw new Exception($"Unexpected ver_minor: {verMinor}");
+                    }
+
+                    // Format the version as v0.xx
+                    qvmVersion = $"v0_{verMajor}{verMinor}";
+                    return qvmVersion;
+                }
+            }
+            catch (Exception ex)
+            {
+                AddLog("Exception while parsing version " + ex.Message);
+                return $"v0_{0}{0}";
+            }
         }
 
         internal static FOpenIO ShowOpenFileDlg(string title, string defaultExt, string filter, bool initDir = false, string initialDirectory = "", bool openFileData = true, bool exceptionOnEmpty = true)
