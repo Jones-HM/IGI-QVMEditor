@@ -1182,6 +1182,25 @@ namespace QVM_Editor
             string scriptFileQvm = scriptFilePathAbsolute + "\\" + fileNameLabel.Text;
             string scriptFileQsc = fileNameLabel.Text.Replace(QUtils.qvmFile, QUtils.qscFile);
             string scriptData = scintilla.Text;
+            
+            // check if both file exists.
+             if (String.IsNullOrEmpty(scriptFilePathAbsolute))
+            {
+                QUtils.ShowError("Cannot find the path of input script file.");
+                QUtils.AddLog("Input file path is null or empty.");
+                QUtils.AddLog("Exiting method: saveToolStripMenuItem_Click()");
+                return;
+            }
+
+            // check if scriptData is empty.
+            if (scriptData.Length == 0 && scriptData.Trim() == "")
+            {
+                QUtils.AddLog("Script data is empty, not saving");
+                QUtils.ShowError("Cannot save script. Script data is empty.");
+                QUtils.AddLog("Exiting method: saveToolStripMenuItem_Click()");
+                return;
+            }
+
 
             // Get the first 10 lines of scriptData
             string[] allLines = scriptData.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
@@ -1189,7 +1208,7 @@ namespace QVM_Editor
             string scriptDataLines = string.Join(Environment.NewLine, allLines, 0, lineCount);
 
             QUtils.AddLog(string.Format("Saving file: {0} scriptFileQvm: {1}" +
-                          "scriptData:{2}{3}",
+                                  "scriptData:{2}{3}",
                           scriptFileQsc, scriptFileQvm, Environment.NewLine, scriptDataLines));
             bool status = QCompiler.Compile(scriptData, scriptFilePathAbsolute, false, fileNameLabel.Text.Replace(QUtils.qvmFile, QUtils.qscFile));
 
@@ -1229,14 +1248,20 @@ namespace QVM_Editor
             QUtils.AddLog("Decompiling done");
 
             scriptFilePath = QUtils.appOutPath + Path.DirectorySeparatorChar + Path.GetFileName(fileName).Replace(QUtils.qvmFile, QUtils.qscFile);
-            InvokeIfNeeded(() => fileNameLabel.Text = Path.GetFileNameWithoutExtension(fileName) + QUtils.qvmFile);
+            InvokeIfNeeded(delegate ()
+            {
+                fileNameLabel.Text = Path.GetFileNameWithoutExtension(fileName) + QUtils.qvmFile;
+            });
             QUtils.AddLog($"Files path are {scriptFilePath} and name {fileNameLabel.Text}");
             scintilla.Text = QUtils.LoadFile(scriptFilePath);
 
             // decompile the qvm version.
             QUtils.qvmVersion = QUtils.ReadQVMVersion(fileName);
             QUtils.AddLog($"appVersionTxt is {appVersionTxt.Text}");
-            InvokeIfNeeded(() => appVersionTxt.Text = "QVM Version: " + QUtils.qvmVersion.Replace("_", ".").Replace("v", ""));
+            InvokeIfNeeded(delegate ()
+            {
+                appVersionTxt.Text = "QVM Version: " + QUtils.qvmVersion.Replace("_", ".").Replace("v", "");
+            });
             QUtils.AddLog($"QVM Version is {QUtils.qvmVersion}");
             QUtils.AddLog($"appVersionTxt is {appVersionTxt.Text}");
             QUtils.AddLog("Exiting method: DecompileQVM()");
@@ -1249,10 +1274,10 @@ namespace QVM_Editor
             QUtils.AddLog("aboutToolStripMenuItem_Click param e = " + e);
 
             string infoMsg = "Project IGI QVM Editor is tool to Edit QVM File in IGI 1 & IGI 2\n" +
-    "Developed by: Haseeb Mir\n" +
-    "App/Language: C# (.NET 4.0) / GUI.\n" +
-    "Credits/Thanks: Artiom (QCompiler), Dark (UI/Tools).\n" +
-    "Application Version: v" + QUtils.appVersion + "\n";
+        "Developed by: Haseeb Mir\n" +
+        "App/Language: C# (.NET 4.0) / GUI.\n" +
+        "Credits/Thanks: Artiom (QCompiler), Dark (UI/Tools).\n" +
+        "Application Version: v" + QUtils.appVersion + "\n";
             QUtils.ShowInfo(infoMsg);
             QUtils.AddLog("Exiting method: aboutToolStripMenuItem_Click()");
         }
