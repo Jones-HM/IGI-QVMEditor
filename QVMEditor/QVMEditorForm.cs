@@ -908,8 +908,32 @@ namespace QVM_Editor
             }
         }
 
-
-
+        private void UpdateUILabel(Label label, string newText)
+{
+    try
+    {
+        if (label.InvokeRequired)
+        {
+            label.Invoke(new Action(() => {
+                label.Text = newText;
+                label.Invalidate();
+                label.Parent?.Invalidate(); // Optional: Invalidate the parent to ensure the layout updates
+                label.Update(); // Force immediate redraw of the label
+            }));
+        }
+        else
+        {
+            label.Text = newText;
+            label.Invalidate();
+            label.Parent?.Invalidate(); // Optional: Invalidate the parent to ensure the layout updates
+            label.Update(); // Force immediate redraw of the label
+        }
+    }
+    catch (Exception ex)
+    {
+        QUtils.LogException(MethodBase.GetCurrentMethod().Name, ex);
+    }
+}
 
         #endregion
 
@@ -1182,9 +1206,9 @@ namespace QVM_Editor
             string scriptFileQvm = scriptFilePathAbsolute + "\\" + fileNameLabel.Text;
             string scriptFileQsc = fileNameLabel.Text.Replace(QUtils.qvmFile, QUtils.qscFile);
             string scriptData = scintilla.Text;
-            
+
             // check if both file exists.
-             if (String.IsNullOrEmpty(scriptFilePathAbsolute))
+            if (String.IsNullOrEmpty(scriptFilePathAbsolute))
             {
                 QUtils.ShowError("Cannot find the path of input script file.");
                 QUtils.AddLog("Input file path is null or empty.");
@@ -1236,7 +1260,7 @@ namespace QVM_Editor
             QUtils.AddLog("Entering method: DecompileQVM()");
             QUtils.AddLog("DecompileQVM param fileName = " + fileName);
 
-            if (string.IsNullOrEmpty(fileName) && !File.Exists(fileName))
+            if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
             {
                 QUtils.AddLog("Invalid file path or file does not exist");
                 QUtils.ShowError("Invalid file path or file does not exist");
@@ -1247,23 +1271,30 @@ namespace QVM_Editor
             QCompiler.DecompileFile(fileName, QUtils.appOutPath);
             QUtils.AddLog("Decompiling done");
 
-            scriptFilePath = QUtils.appOutPath + Path.DirectorySeparatorChar + Path.GetFileName(fileName).Replace(QUtils.qvmFile, QUtils.qscFile);
-            InvokeIfNeeded(delegate ()
-            {
-                fileNameLabel.Text = Path.GetFileNameWithoutExtension(fileName) + QUtils.qvmFile;
-            });
+            scriptFilePath = Path.Combine(QUtils.appOutPath, Path.GetFileName(fileName).Replace(QUtils.qvmFile, QUtils.qscFile));
+
             QUtils.AddLog($"Files path are {scriptFilePath} and name {fileNameLabel.Text}");
             scintilla.Text = QUtils.LoadFile(scriptFilePath);
 
             // decompile the qvm version.
             QUtils.qvmVersion = QUtils.ReadQVMVersion(fileName);
             QUtils.AddLog($"appVersionTxt is {appVersionTxt.Text}");
-            InvokeIfNeeded(delegate ()
+
+            string qvmVersionText = QUtils.qvmVersion;
+            if (string.IsNullOrEmpty(qvmVersionText))
             {
-                appVersionTxt.Text = "QVM Version: " + QUtils.qvmVersion.Replace("_", ".").Replace("v", "");
-            });
-            QUtils.AddLog($"QVM Version is {QUtils.qvmVersion}");
-            QUtils.AddLog($"appVersionTxt is {appVersionTxt.Text}");
+                QUtils.ShowError("Error reading QVM version from file.");
+                QUtils.AddLog("Error reading QVM version from file.");
+            }
+            QUtils.AddLog($"QVM Version before is {qvmVersionText}");
+            qvmVersionText = "QVM: " + qvmVersionText.Replace("_", ".").Replace("v", "");
+            QUtils.AddLog($"QVM Version after is {qvmVersionText}");
+
+           string fileNameText = Path.GetFileNameWithoutExtension(fileName) + QUtils.qvmFile;
+
+            UpdateUILabel(fileNameLabel, fileNameText);
+            UpdateUILabel(appVersionTxt, qvmVersionText);
+
             QUtils.AddLog("Exiting method: DecompileQVM()");
         }
 
