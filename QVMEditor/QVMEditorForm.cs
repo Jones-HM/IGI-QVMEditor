@@ -90,6 +90,17 @@ namespace QVM_Editor
 
             // init hotkeys
             InitHotkeys();
+
+            // Handle command-line arguments
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
+            {
+                string fileName = args[1];
+                scriptFilePathAbsolute = Path.GetDirectoryName(fileName);
+                // Already handing QVM,QSC files in InitDragDropFile() method.
+                //skip if already opened.
+            }
+
             QUtils.AddLog("Exiting method: QVMEditorForm_Load()");
         }
 
@@ -376,6 +387,7 @@ namespace QVM_Editor
                 string[] filePaths = (string[])e.Data.GetData(DataFormats.FileDrop, false);
                 string fileName = filePaths[0];
                 scriptFilePathAbsolute = Path.GetDirectoryName(fileName);
+                QUtils.AddLog("InitDragDropFile scriptFilePathAbsolute = " + scriptFilePathAbsolute);
 
                 if (fileName.Contains(".qvm") || fileName.Contains(".qsc") || fileName.Contains(".dat"))
                 {
