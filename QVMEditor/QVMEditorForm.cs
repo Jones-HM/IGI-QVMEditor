@@ -25,7 +25,7 @@ namespace QVM_Editor
             InitializeComponent();
             qvmInstance = this;
             QUtils.InitEditorAppData();
-            appVersionTxt.Text = "Version: " + QUtils.appVersion;
+            appVersionTxt.Text = "QVM Version: " + QUtils.qvmVersion;
             QUtils.logEnabled = true;
 
             QUtils.AddLog("QVM Editor Started.");
@@ -889,7 +889,6 @@ namespace QVM_Editor
 
         public static Color IntToColor(int rgb)
         {
-            QUtils.AddLog("IntToColor param rgb = " + rgb);
             return Color.FromArgb(255, (byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb);
         }
 
@@ -1183,10 +1182,15 @@ namespace QVM_Editor
             string scriptFileQvm = scriptFilePathAbsolute + "\\" + fileNameLabel.Text;
             string scriptFileQsc = fileNameLabel.Text.Replace(QUtils.qvmFile, QUtils.qscFile);
             string scriptData = scintilla.Text;
-            
-            // Corrected the logging statement here
-            QUtils.AddLog("Saving file: " + scriptFileQsc + " scriptFileQvm: " + scriptFileQvm + " scriptData: " + scriptData);
 
+            // Get the first 10 lines of scriptData
+            string[] allLines = scriptData.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            int lineCount = Math.Min(10, allLines.Length);
+            string scriptDataLines = string.Join(Environment.NewLine, allLines, 0, lineCount);
+
+            QUtils.AddLog(string.Format("Saving file: {0} scriptFileQvm: {1}" +
+                          "scriptData:{2}{3}",
+                          scriptFileQsc, scriptFileQvm, Environment.NewLine, scriptDataLines));
             bool status = QCompiler.Compile(scriptData, scriptFilePathAbsolute, false, fileNameLabel.Text.Replace(QUtils.qvmFile, QUtils.qscFile));
 
             if (status)
@@ -1220,11 +1224,11 @@ namespace QVM_Editor
             scriptFilePath = QUtils.appOutPath + Path.DirectorySeparatorChar + Path.GetFileName(fileName).Replace(QUtils.qvmFile, QUtils.qscFile);
             fileNameLabel.Text = Path.GetFileNameWithoutExtension(fileName) + QUtils.qvmFile;
             scintilla.Text = QUtils.LoadFile(scriptFilePath);
-            QUtils.AddLog("Files path are {scriptFilePath} {fileNameLabel.Text}");
+            QUtils.AddLog($"Files path are {scriptFilePath} {fileNameLabel.Text}");
 
             // decompile the qvm version.
-            string qvmVersion = QUtils.ReadQVMVersion(fileName);
-            QUtils.AddLog("QVM version is {qvmVersion}");
+            QUtils.qvmVersion = QUtils.ReadQVMVersion(fileName);
+            InvokeIfNeeded(() => appVersionTxt.Text += QUtils.qvmVersion);
             QUtils.AddLog("Exiting method: DecompileQVM()");
         }
 

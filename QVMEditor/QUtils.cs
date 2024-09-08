@@ -15,8 +15,8 @@ namespace QVM_Editor
 {
     internal class QUtils
     {
-        private static string logFile;
-        internal const string appVersion = "0.5", qvmFile = ".qvm", qscFile = ".qsc", CAPTION_CONFIG_ERR = "Config - Error", CAPTION_FATAL_SYS_ERR = "Fatal sytem - Error", CAPTION_APP_ERR = "Application - Error", CAPTION_COMPILER_ERR = "Compiler - Error", EDITOR_LEVEL_ERR = "EDITOR ERROR";
+        internal static string logFile;
+        internal const string appVersion = "0.6", qvmFile = ".qvm", qscFile = ".qsc", CAPTION_CONFIG_ERR = "Config - Error", CAPTION_FATAL_SYS_ERR = "Fatal sytem - Error", CAPTION_APP_ERR = "Application - Error", CAPTION_COMPILER_ERR = "Compiler - Error", EDITOR_LEVEL_ERR = "EDITOR ERROR";
         internal static bool logEnabled = false;
         internal static string appdataPath, qvmEditorQEdPath, objectsModelsFile, editorAppName, qfilesPath = @"\QFiles", qEditor = "QEditor", qconv = "QConv", qCompiler = "QCompiler", qCompilerPath, tempPathFile, tempPathFileName = "TempPath.txt",
          igiQsc = "IGI_QSC", igiQvm = "IGI_QVM", cfgGamePathEx = @"\missions\location0\level", weaponsDirPath = @"\weapons", qvmVersion = "";
@@ -243,16 +243,17 @@ namespace QVM_Editor
             AddLog(methodName, logMsg);
         }
 
-        internal static void AddLog(string methodName, string logMsg)
+        internal static void AddLog(string methodName, string logMsg, string logPath = null)
         {
             if (logEnabled)
             {
                 methodName = methodName.Replace("_Click", String.Empty).Replace("_SelectedIndexChanged", String.Empty).Replace("_SelectedValueChanged", String.Empty);
-                File.AppendAllText(logFile, "[" + DateTime.Now.ToString("yyyy-MM-dd - HH:mm:ss") + "] " + methodName + "(): " + logMsg + "\n");
+                string path = logPath ?? logFile;
+                File.AppendAllText(path, "[" + DateTime.Now.ToString("yyyy-MM-dd - HH:mm:ss") + "] " + methodName + "(): " + logMsg + "\n");
             }
         }
 
-        internal static void AddLog(string logMsg)
+        internal static void AddLog(string logMsg, string logPath = null)
         {
             if (logEnabled)
             {
@@ -260,8 +261,8 @@ namespace QVM_Editor
                     .Replace("_Click", "")
                     .Replace("_SelectedIndexChanged", "")
                     .Replace("_SelectedValueChanged", "");
-
-                File.AppendAllText(logFile, "[" + DateTime.Now.ToString("yyyy-MM-dd - HH:mm:ss") + "] " + methodName + "(): " + logMsg + "\n");
+                string path = logPath ?? logFile;
+                File.AppendAllText(path, "[" + DateTime.Now.ToString("yyyy-MM-dd - HH:mm:ss") + "] " + methodName + "(): " + logMsg + "\n");
             }
         }
 
@@ -422,6 +423,9 @@ namespace QVM_Editor
                     int verMajor = reader.ReadInt32();
                     int verMinor = reader.ReadInt32();
 
+                    AddLog($"SignatureBytes are {signatureBytes} and signature is {signature}");
+                    AddLog($"Version major is {verMajor}, minor is {verMinor}");
+
                     // Validate the signature and version
                     if (signature != "LOOP")
                     {
@@ -438,6 +442,7 @@ namespace QVM_Editor
 
                     // Format the version as v0.xx
                     qvmVersion = $"v0_{verMajor}{verMinor}";
+                    AddLog($"Parsed QVM version: {qvmVersion}");
                     return qvmVersion;
                 }
             }
