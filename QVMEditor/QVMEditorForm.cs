@@ -25,8 +25,8 @@ namespace QVM_Editor
             InitializeComponent();
             qvmInstance = this;
             QUtils.InitEditorAppData();
-            appVersionTxt.Text = "QVM Version: " + QUtils.qvmVersion;
             QUtils.logEnabled = true;
+            QUtils.logFilePath = Path.Combine(Directory.GetCurrentDirectory(), QUtils.logFile);
 
             QUtils.AddLog("QVM Editor Started.");
             // Init Scintilla component.
@@ -1217,18 +1217,28 @@ namespace QVM_Editor
             QUtils.AddLog("Entering method: DecompileQVM()");
             QUtils.AddLog("DecompileQVM param fileName = " + fileName);
 
+            if (string.IsNullOrEmpty(fileName) && !File.Exists(fileName))
+            {
+                QUtils.AddLog("Invalid file path or file does not exist");
+                QUtils.ShowError("Invalid file path or file does not exist");
+                return;
+            }
+
             QUtils.AddLog("Decompiling file: " + fileName);
             QCompiler.DecompileFile(fileName, QUtils.appOutPath);
             QUtils.AddLog("Decompiling done");
 
             scriptFilePath = QUtils.appOutPath + Path.DirectorySeparatorChar + Path.GetFileName(fileName).Replace(QUtils.qvmFile, QUtils.qscFile);
-            fileNameLabel.Text = Path.GetFileNameWithoutExtension(fileName) + QUtils.qvmFile;
+            InvokeIfNeeded(() => fileNameLabel.Text = Path.GetFileNameWithoutExtension(fileName) + QUtils.qvmFile);
+            QUtils.AddLog($"Files path are {scriptFilePath} and name {fileNameLabel.Text}");
             scintilla.Text = QUtils.LoadFile(scriptFilePath);
-            QUtils.AddLog($"Files path are {scriptFilePath} {fileNameLabel.Text}");
 
             // decompile the qvm version.
             QUtils.qvmVersion = QUtils.ReadQVMVersion(fileName);
-            InvokeIfNeeded(() => appVersionTxt.Text += QUtils.qvmVersion);
+            QUtils.AddLog($"appVersionTxt is {appVersionTxt.Text}");
+            InvokeIfNeeded(() => appVersionTxt.Text = "QVM Version: " + QUtils.qvmVersion.Replace("_", ".").Replace("v", ""));
+            QUtils.AddLog($"QVM Version is {QUtils.qvmVersion}");
+            QUtils.AddLog($"appVersionTxt is {appVersionTxt.Text}");
             QUtils.AddLog("Exiting method: DecompileQVM()");
         }
 

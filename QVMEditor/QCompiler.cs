@@ -44,7 +44,7 @@ namespace QVM_Editor
                 dest = dest.Replace(QUtils.qvmFile, QUtils.qscFile);
             }
             string moveOutput = QUtils.ShellExec($"move /y \"{src}\" \"{dest}\"");
-            QUtils.AddLog("XMove: Move output: " + moveOutput);
+            QUtils.AddLog(logMsg: "XMove: Move output: " + moveOutput, logPath: QUtils.logFilePath);
             return !moveOutput.Contains("0 File(s) moved");
         }
 
@@ -58,9 +58,10 @@ namespace QVM_Editor
                     return false;
                 }
                 string currentPath = Directory.GetCurrentDirectory();
-                string currentLogFilePath = Path.Combine(currentPath, QUtils.logFile);
-                QUtils.AddLog("QCompile: Log file path is " + currentLogFilePath);
+                QUtils.logFilePath = Path.Combine(currentPath, QUtils.logFile);
+                QUtils.AddLog("QCompile: Log file path is " + QUtils.logFilePath);
 
+                QUtils.AddLog("QCompile: setting path to " + compilePath);
                 QSetPath(compilePath);
 
                 // Checking the QVM version before saving.
@@ -71,7 +72,7 @@ namespace QVM_Editor
                     compileStart = compileStartv7;
 
                 string shellOut = QUtils.ShellExec(compileStart);
-                QUtils.AddLog(logMsg: "Compile output: " + shellOut, logPath: currentLogFilePath);
+                QUtils.AddLog(logMsg: "Compile output: " + shellOut, logPath: QUtils.logFilePath);
                 if (shellOut.Contains("Error") || shellOut.Contains("importModule") || shellOut.Contains("ModuleNotFoundError") || shellOut.Contains("Converted: 0"))
                 {
                     QUtils.ShowError("QCompiler: Error in compiling input files");
@@ -81,13 +82,16 @@ namespace QVM_Editor
                 string srcPath = Path.Combine(Directory.GetCurrentDirectory(), "output", qscFiles[0]);
                 string destPath = Path.Combine(outputPath, qscFiles[0]);
 
-                QUtils.AddLog(logMsg: "QDecompile: Source path is " + srcPath, logPath: currentLogFilePath);
-                QUtils.AddLog(logMsg: "QDecompile: Destination path is " + destPath, logPath: currentLogFilePath);
+                QUtils.AddLog(logMsg: "QDecompile: Source path is " + srcPath, logPath: QUtils.logFilePath);
+                QUtils.AddLog(logMsg: "QDecompile: Destination path is " + destPath, logPath: QUtils.logFilePath);
 
-                if (!XMove(srcPath, destPath, QTYPE.COMPILE))
+                bool moveStatus = XMove(srcPath, destPath, QTYPE.COMPILE);
+                QUtils.AddLog(logMsg: "QDecompile: Move status is " + moveStatus, logPath: QUtils.logFilePath);
+
+                if (!moveStatus)
                 {
                     QUtils.ShowError("QCompiler: Error while moving data to Output path");
-                    QUtils.AddLog(logMsg: "Compile: Error while moving data to Output path", logPath: currentLogFilePath);
+                    QUtils.AddLog(logMsg: "Compile: Error while moving data to Output path", logPath: QUtils.logFilePath);
                     return false;
                 }
 
@@ -116,30 +120,34 @@ namespace QVM_Editor
                 }
 
                 string currentPath = Directory.GetCurrentDirectory();
-                string currentLogFilePath = Path.Combine(currentPath, QUtils.logFile);
-                QUtils.AddLog("QDecompile: Log file path is " + currentLogFilePath);
+                QUtils.logFilePath = Path.Combine(currentPath, QUtils.logFile);
+                QUtils.AddLog("QDecompile: Log file path is " + QUtils.logFilePath);
 
                 QUtils.AddLog("QDecompile: setting path to " + decompilePath);
                 QSetPath(decompilePath);
 
                 string shellOut = QUtils.ShellExec(decompileStart);
-                QUtils.AddLog(logMsg: "Decompile output: " + shellOut, logPath: currentLogFilePath);
+                QUtils.AddLog(logMsg: "Decompile output: " + shellOut, logPath: QUtils.logFilePath);
                 if (shellOut.Contains("Error") || shellOut.Contains("importModule") || shellOut.Contains("ModuleNotFoundError") || shellOut.Contains("Converted: 0"))
                 {
                     QUtils.ShowError("QCompiler: Error in decompiling input files");
                     return false;
                 }
 
+                QSetPath(decompilePath);
                 string srcPath = Path.Combine(Directory.GetCurrentDirectory(), "output", qvmFiles[0]);
                 string destPath = Path.Combine(outputPath, qvmFiles[0]);
 
-                QUtils.AddLog(logMsg: "QDecompile: Source path is " + srcPath, logPath: currentLogFilePath);
-                QUtils.AddLog(logMsg: "QDecompile: Destination path is " + destPath, logPath: currentLogFilePath);
+                QUtils.AddLog(logMsg: "QDecompile: Source path is " + srcPath, logPath: QUtils.logFilePath);
+                QUtils.AddLog(logMsg: "QDecompile: Destination path is " + destPath, logPath: QUtils.logFilePath);
 
-                if (!XMove(srcPath, destPath, QTYPE.DECOMPILE))
+                bool moveStatus = XMove(srcPath, destPath, QTYPE.DECOMPILE);
+                QUtils.AddLog(logMsg: "QDecompile: Move status is " + moveStatus, logPath: QUtils.logFilePath);
+
+                if (!moveStatus)
                 {
-                    QUtils.ShowError("QCompiler: Error while moving data to Output path");
-                    QUtils.AddLog(logMsg: "Decompile: Error while moving data to Output path", logPath: currentLogFilePath);
+                    QUtils.ShowError("QDecompile: Error while moving data to Output path");
+                    QUtils.AddLog(logMsg: "Decompile: Error while moving data to Output path", logPath: QUtils.logFilePath);
                     return false;
                 }
 

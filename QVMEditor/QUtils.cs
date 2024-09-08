@@ -15,7 +15,7 @@ namespace QVM_Editor
 {
     internal class QUtils
     {
-        internal static string logFile;
+        internal static string logFile, logFilePath;
         internal const string appVersion = "0.6", qvmFile = ".qvm", qscFile = ".qsc", CAPTION_CONFIG_ERR = "Config - Error", CAPTION_FATAL_SYS_ERR = "Fatal sytem - Error", CAPTION_APP_ERR = "Application - Error", CAPTION_COMPILER_ERR = "Compiler - Error", EDITOR_LEVEL_ERR = "EDITOR ERROR";
         internal static bool logEnabled = false;
         internal static string appdataPath, qvmEditorQEdPath, objectsModelsFile, editorAppName, qfilesPath = @"\QFiles", qEditor = "QEditor", qconv = "QConv", qCompiler = "QCompiler", qCompilerPath, tempPathFile, tempPathFileName = "TempPath.txt",
@@ -245,25 +245,51 @@ namespace QVM_Editor
 
         internal static void AddLog(string methodName, string logMsg, string logPath = null)
         {
+            File.WriteAllText("demo.txt", $"logPath file is {logPath}\n");
             if (logEnabled)
             {
-                methodName = methodName.Replace("_Click", String.Empty).Replace("_SelectedIndexChanged", String.Empty).Replace("_SelectedValueChanged", String.Empty);
-                string path = logPath ?? logFile;
-                File.AppendAllText(path, "[" + DateTime.Now.ToString("yyyy-MM-dd - HH:mm:ss") + "] " + methodName + "(): " + logMsg + "\n");
+                if (logPath == null || (!logPath.Contains("/") || !logPath.Contains("\\")))
+                {
+                    logPath = QUtils.logFilePath;
+                }
+                methodName = methodName.Replace("_Click", "").Replace("_SelectedIndexChanged", "").Replace("_SelectedValueChanged", "");
+                File.AppendAllText("demo.txt", $"logPath file is {logPath}\n");
+                string path = SanitizePath(logPath ?? logFile);
+                File.AppendAllText("demo.txt", $"Path file is {path}\n");
+                File.AppendAllText(path, $"[{DateTime.Now:yyyy-MM-dd - HH:mm:ss}] {methodName}(): {logMsg}\n");
             }
         }
 
         internal static void AddLog(string logMsg, string logPath = null)
         {
+            File.WriteAllText("demo.txt", $"logPath file is {logPath}\n");
+            
             if (logEnabled)
             {
                 var methodName = new StackTrace().GetFrame(1).GetMethod().Name
                     .Replace("_Click", "")
                     .Replace("_SelectedIndexChanged", "")
                     .Replace("_SelectedValueChanged", "");
-                string path = logPath ?? logFile;
-                File.AppendAllText(path, "[" + DateTime.Now.ToString("yyyy-MM-dd - HH:mm:ss") + "] " + methodName + "(): " + logMsg + "\n");
+
+                if (logPath == null || (!logPath.Contains("/") || !logPath.Contains("\\")))
+                {
+                    logPath = QUtils.logFilePath;
+                }
+
+                File.AppendAllText("demo.txt", $"logPath file is {logPath}\n");
+                string path = SanitizePath(logPath ?? logFile);
+                File.AppendAllText("demo.txt", $"Path file is {path}\n");
+                File.AppendAllText(path, $"[{DateTime.Now:yyyy-MM-dd - HH:mm:ss}] {methodName}(): {logMsg}\n");
             }
+        }
+
+        private static string SanitizePath(string path)
+        {
+            foreach (char c in Path.GetInvalidPathChars())
+            {
+                path = path.Replace(c.ToString(), "");
+            }
+            return path;
         }
 
         internal static void SaveFile(string data = null, bool appendData = false, string qscFile = "objects.qsc")
