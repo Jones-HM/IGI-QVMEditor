@@ -15,13 +15,12 @@ namespace QVM_Editor
         {
             try
             {
-                bool instanceCount = false;
-                Mutex mutex = null;
+                int semaphoreCount = 5;
+                Semaphore semaphore = new Semaphore(semaphoreCount, semaphoreCount, AppDomain.CurrentDomain.FriendlyName);
                 var projAppName = AppDomain.CurrentDomain.FriendlyName;
                 AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnAppExit);
 
-                mutex = new Mutex(true, projAppName, out instanceCount);
-                if (instanceCount)
+                if (semaphore.WaitOne(TimeSpan.Zero, true))
                 {
                     if (args.Length > 0)
                     {
@@ -32,16 +31,16 @@ namespace QVM_Editor
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
                     Application.Run(new QVMEditorForm());
-                    mutex.ReleaseMutex();
+                    semaphore.Release();
                 }
                 else
                 {
-                    QUtils.ShowError("QVM Editor is already running");
+                    QUtils.ShowError($"Only {semaphoreCount} instances of QVM Editor are allowed to run at the same time.");
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                QUtils.ShowLogException("QVMEditor", ex);
+                QUtils.ShowLogException("QVMEditor Main Exception: ", exception);
             }
         }
 
