@@ -1280,7 +1280,14 @@ namespace QVM_Editor
             }
 
             QUtils.AddLog("Decompiling file: " + fileName);
-            QCompiler.DecompileFile(fileName, QUtils.appOutPath);
+            bool status = QCompiler.DecompileFile(fileName, QUtils.appOutPath);
+            
+            if (!status)
+            {
+                QUtils.AddLog("Decompilation failed not loaded the QVM file.");
+                return;
+            }
+
             QUtils.AddLog("Decompiling done");
 
             scriptFilePath = Path.Combine(QUtils.appOutPath, Path.GetFileName(fileName).Replace(QUtils.qvmFile, QUtils.qscFile));

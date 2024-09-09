@@ -25,8 +25,28 @@ namespace QVM_Editor
             string copyPath = GetInputPath(type);
             foreach (var file in files)
             {
-                if (!File.Exists(file) || !QUtils.ShellExec($"copy \"{file}\" \"{copyPath}\"").Contains("1 file(s) copied"))
+                if (!File.Exists(file))
+                {
+                    QUtils.AddLog($"QCopy: File does not exist: {file}");
                     return false;
+                }
+
+                try
+                {
+                    // Use .NET method to copy files, this does not rely on system language
+                    File.Copy(file, Path.Combine(copyPath, Path.GetFileName(file)), true);
+                    QUtils.AddLog($"QCopy: Successfully copied file: {file} to {copyPath}");
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    QUtils.AddLog($"QCopy: UnauthorizedAccessException while copying file: {file} to {copyPath}. Exception: {ex.Message}");
+                    return false;
+                }
+                catch (IOException ex)
+                {
+                    QUtils.AddLog($"QCopy: IOException while copying file: {file} to {copyPath}. Exception: {ex.Message}");
+                    return false;
+                }
             }
             return true;
         }
@@ -43,10 +63,42 @@ namespace QVM_Editor
                 src = src.Replace(QUtils.qvmFile, QUtils.qscFile);
                 dest = dest.Replace(QUtils.qvmFile, QUtils.qscFile);
             }
-            string moveOutput = QUtils.ShellExec($"move /y \"{src}\" \"{dest}\"");
-            QUtils.AddLog(logMsg: "XMove: Move output: " + moveOutput, logPath: QUtils.logFilePath);
-            return !moveOutput.Contains("0 File(s) moved");
+
+            QUtils.AddLog($"XMove: Attempting to move from {src} to {dest}");
+
+            // Remove quotes from source and destination paths
+            if( src.StartsWith("\"") && src.EndsWith("\"")){
+                src = src.Replace("\"", "");
+                dest = dest.Replace("\"", "");
+            }
+            
+            try
+            {
+                // Attempt to delete the destination file if it exists
+                QUtils.FileIODelete(dest);
+
+                QUtils.FileMove(src, dest);
+                QUtils.AddLog($"XMove: File moved from '{src}' to '{dest}'");
+
+                // Post-move verification
+                if (File.Exists(dest) && !File.Exists(src))
+                {
+                    QUtils.AddLog($"XMove: Move verified successfully from {src} to {dest}");
+                }
+                else
+                {
+                    QUtils.AddLog($"XMove: Move verification failed from {src} to {dest}");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                QUtils.AddLog($"XMove: Error during file move from {src} to {dest}. Exception: {ex.Message}");
+                return false;
+            }
+            return true;
         }
+
 
         public bool QCompile(List<string> qscFiles, string outputPath)
         {
@@ -54,9 +106,15 @@ namespace QVM_Editor
             {
                 if (!QCopy(qscFiles, QTYPE.COMPILE))
                 {
-                    QUtils.ShowError("QCompiler: Error occurred while copying files");
+                    foreach (var file in qscFiles)
+                    {
+                        QUtils.AddLog($"QDecompile: File in qscFiles list: {file}");
+                    }
+                    QUtils.ShowError("Error occurred while copying files");
+                    QUtils.AddLog($"QDecompile: Error occurred while copying files {qscFiles} and path is {compilePath}");
                     return false;
                 }
+
                 string currentPath = Directory.GetCurrentDirectory();
                 QUtils.logFilePath = Path.Combine(currentPath, QUtils.logFile);
                 QUtils.AddLog("QCompile: Log file path is " + QUtils.logFilePath);
@@ -71,6 +129,7 @@ namespace QVM_Editor
                 else if (QUtils.qvmVersion == nameof(QUtils.QVMVersion.v0_87))
                     compileStart = compileStartv7;
 
+                QUtils.AddLog(logMsg: "Compile command file: " + compileStart, logPath: QUtils.logFilePath);
                 string shellOut = QUtils.ShellExec(compileStart);
                 QUtils.AddLog(logMsg: "Compile output: " + shellOut, logPath: QUtils.logFilePath);
                 if (shellOut.Contains("Error") || shellOut.Contains("importModule") || shellOut.Contains("ModuleNotFoundError") || shellOut.Contains("Converted: 0"))
@@ -82,11 +141,15 @@ namespace QVM_Editor
                 string srcPath = Path.Combine(Directory.GetCurrentDirectory(), "output", qscFiles[0]);
                 string destPath = Path.Combine(outputPath, qscFiles[0]);
 
-                QUtils.AddLog(logMsg: "QDecompile: Source path is " + srcPath, logPath: QUtils.logFilePath);
-                QUtils.AddLog(logMsg: "QDecompile: Destination path is " + destPath, logPath: QUtils.logFilePath);
+                // Ensure paths are properly quoted
+                srcPath = $"\"{srcPath}\"";
+                destPath = $"\"{destPath}\"";
+
+                QUtils.AddLog(logMsg: "QCompile: Source path is " + srcPath, logPath: QUtils.logFilePath);
+                QUtils.AddLog(logMsg: "QCompile: Destination path is " + destPath, logPath: QUtils.logFilePath);
 
                 bool moveStatus = XMove(srcPath, destPath, QTYPE.COMPILE);
-                QUtils.AddLog(logMsg: "QDecompile: Move status is " + moveStatus, logPath: QUtils.logFilePath);
+                QUtils.AddLog(logMsg: "QCompile: Move status is " + moveStatus, logPath: QUtils.logFilePath);
 
                 if (!moveStatus)
                 {
@@ -114,6 +177,10 @@ namespace QVM_Editor
             {
                 if (!QCopy(qvmFiles, QTYPE.DECOMPILE))
                 {
+                    foreach (var file in qvmFiles)
+                    {
+                        QUtils.AddLog($"QDecompile: File in qvmFiles list: {file}");
+                    }
                     QUtils.ShowError("Error occurred while copying files");
                     QUtils.AddLog($"QDecompile: Error occurred while copying files {qvmFiles} and path is {decompilePath}");
                     return false;
@@ -134,22 +201,6 @@ namespace QVM_Editor
                     return false;
                 }
 
-                QSetPath(decompilePath);
-                string srcPath = Path.Combine(Directory.GetCurrentDirectory(), "output", qvmFiles[0]);
-                string destPath = Path.Combine(outputPath, qvmFiles[0]);
-
-                QUtils.AddLog(logMsg: "QDecompile: Source path is " + srcPath, logPath: QUtils.logFilePath);
-                QUtils.AddLog(logMsg: "QDecompile: Destination path is " + destPath, logPath: QUtils.logFilePath);
-
-                bool moveStatus = XMove(srcPath, destPath, QTYPE.DECOMPILE);
-                QUtils.AddLog(logMsg: "QDecompile: Move status is " + moveStatus, logPath: QUtils.logFilePath);
-
-                if (!moveStatus)
-                {
-                    QUtils.ShowError("QDecompile: Error while moving data to Output path");
-                    QUtils.AddLog(logMsg: "Decompile: Error while moving data to Output path", logPath: QUtils.logFilePath);
-                    return false;
-                }
 
                 return true;
             }
