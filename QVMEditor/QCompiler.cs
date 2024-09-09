@@ -33,7 +33,6 @@ namespace QVM_Editor
 
                 try
                 {
-                    // Use .NET method to copy files, this does not rely on system language
                     File.Copy(file, Path.Combine(copyPath, Path.GetFileName(file)), true);
                     QUtils.AddLog($"QCopy: Successfully copied file: {file} to {copyPath}");
                 }
@@ -66,12 +65,6 @@ namespace QVM_Editor
 
             QUtils.AddLog($"XMove: Attempting to move from {src} to {dest}");
 
-            // Remove quotes from source and destination paths
-            if( src.StartsWith("\"") && src.EndsWith("\"")){
-                src = src.Replace("\"", "");
-                dest = dest.Replace("\"", "");
-            }
-            
             try
             {
                 // Attempt to delete the destination file if it exists
@@ -141,10 +134,6 @@ namespace QVM_Editor
                 string srcPath = Path.Combine(Directory.GetCurrentDirectory(), "output", qscFiles[0]);
                 string destPath = Path.Combine(outputPath, qscFiles[0]);
 
-                // Ensure paths are properly quoted
-                srcPath = $"\"{srcPath}\"";
-                destPath = $"\"{destPath}\"";
-
                 QUtils.AddLog(logMsg: "QCompile: Source path is " + srcPath, logPath: QUtils.logFilePath);
                 QUtils.AddLog(logMsg: "QCompile: Destination path is " + destPath, logPath: QUtils.logFilePath);
 
@@ -171,7 +160,7 @@ namespace QVM_Editor
             }
         }
 
-        public bool QDecompile(List<string> qvmFiles, string outputPath)
+        public bool QDecompile(List<string> qvmFiles, string outputPath) // Outputpath is unused TODO: Support this for Decompile data methods.
         {
             try
             {
